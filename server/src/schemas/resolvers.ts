@@ -2,11 +2,11 @@ import type IUserContext from '../interfaces/UserContext.js';
 import type IUserDocument from '../interfaces/UserDocument.js';
 import type IBookInput from '../interfaces/BookInput.js';
 import { User } from '../models/index.js';
-import { signToken, AuthenticationError } from '../services/auth-service.js';
+import { signToken, AuthenticationError } from '../services/auth.js';
 
 const resolvers = {
   Query: {
-    me: async (_parent: any, _args: any, context: IUserContext): Promise<IUserDocument | null> => {
+    me: async (_parent: any, _args: any, context: IUserContext) => {
       
       if (context.user) {
 
@@ -17,13 +17,13 @@ const resolvers = {
     },
   },
   Mutation: {
-    addUser: async (_parent: any, args: any): Promise<{ token: string; user: IUserDocument }> => {
+    addUser: async (_parent: any, args: any) => {
       const user = await User.create(args);
       const token = signToken(user.username, user.email, user._id);
             
       return { token, user };
     },
-    login: async (_parent: any, { email, password }: { email: string; password: string }): Promise<{ token: string; user: IUserDocument }> => {
+    login: async (_parent: any, { email, password }: { email: string; password: string }) => {
       const user = await User.findOne({ email });
 
       if (!user || !(await user.isCorrectPassword(password))) {
@@ -33,7 +33,7 @@ const resolvers = {
       const token = signToken(user.username, user.email, user._id);
       return { token, user };
     },
-    saveBook: async (_parent: any, { bookData }: { bookData: IBookInput }, context: IUserContext): Promise<IUserDocument | null> => {
+    saveBook: async (_parent: any, { bookData }: { bookData: IBookInput }, context: IUserContext) => {
       if (context.user) {
         const updatedUser = await User.findByIdAndUpdate(
           { _id: context.user._id },
@@ -46,7 +46,7 @@ const resolvers = {
 
       throw new AuthenticationError('User not authenticated');
     },
-    removeBook: async (_parent: any, { bookId }: { bookId: string }, context: IUserContext): Promise<IUserDocument | null> => {
+    removeBook: async (_parent: any, { bookId }: { bookId: string }, context: IUserContext) => {
       if (context.user) {
         const updatedUser = await User.findOneAndUpdate(
           { _id: context.user._id },

@@ -1,12 +1,12 @@
 import { Schema, model, type Document } from 'mongoose';
-import bcrypt from 'bcryptjs';
-import { type IBook, bookSchema } from './Book.js';
+import bcrypt from 'bcrypt';
+import  bookSchema, { BookDocument } from './Book.js';
 
 interface IUser extends Document {
   username: string;
   email: string;
   password: string;
-  savedBooks: IBook[];
+  savedBooks: BookDocument[];
   isCorrectPassword(password: string): Promise<boolean>;
   bookCount: number;
 }
